@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Somatic Master Health & Body Proportions Wheels (Metabolic Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Sarabun', 'Inter', 'sans-serif'] },
+                    colors: {
+                        physic: '#0d9488', organic: '#059669', neural: '#4f46e5',
+                        fat: '#ea580c', muscle: '#dc2626', shape: '#2563eb',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Sarabun', 'Inter', sans-serif; background-color: #f8fafc; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-indigo-500 selection:text-white">
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 border-b border-slate-800 pb-6">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-950/50 border border-indigo-800 px-2.5 py-1 rounded-md">Designed by longevity Coach Aoy Kannika & Coach Art Voraprach</span>
+                <h1 class="text-2xl md:text-3xl font-black text-white mt-2 tracking-tight flex items-center gap-2">
+                    <span class="material-icons text-indigo-500 text-3xl">analytics</span>
+                    Executive Energy & Body Performance Assessment
+                </h1>
+                <p class="text-slate-400 text-xs mt-1">ระบบวิเคราะห์สุขภาพเชิงลึก ปรับสมดุลพลังชีวิต รูปร่าง สัดส่วน และคำนวณพลังงานอัตโนมัติ</p>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 bg-slate-900/60 p-2 rounded-xl border border-slate-800/80 w-full md:w-auto">
+                <span class="text-[10px] uppercase font-bold text-slate-500 block w-full mb-1 px-1">Simulated Profiles:</span>
+                <button onclick="loadSimulatedProfile('athlete')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700/50">High Lean Muscle</button>
+                <button onclick="loadSimulatedProfile('fatigue')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700/50">Skinny Fat Profile</button>
+                <button onclick="loadSimulatedProfile('structural_issue')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs rounded-lg transition border border-slate-700/50">High Body Fat</button>
+                <button onclick="resetAllWheels()" class="px-2.5 py-1 bg-red-950/40 hover:bg-red-900/40 text-red-400 text-xs rounded-lg transition border border-red-900/50 flex items-center gap-1">
+                    <span class="material-icons text-xs">refresh</span> รีเซ็ตทั้งหมด
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <div class="lg:col-span-7 space-y-6">
+                
+                <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm">
+                    <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <span class="material-icons text-xs text-indigo-400">badge</span>
+                        ข้อมูลผู้รับการตรวจวิเคราะห์ (Client Intake Record)
+                    </h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">ชื่อ-นามสกุล</label>
+                            <input type="text" id="cust-name" oninput="calculateMetabolism(); generateSomaticReport();" placeholder="ระบุชื่อผู้รับบริการ" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">เพศ</label>
+                            <select id="cust-gender" onchange="calculateMetabolism(); generateSomaticReport();" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                                <option value="male">ชาย (Male)</option>
+                                <option value="female" selected>หญิง (Female)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">อายุ (ปี)</label>
+                            <input type="number" id="cust-age" oninput="calculateMetabolism(); generateSomaticReport();" placeholder="ปี" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">น้ำหนัก (กก.)</label>
+                            <input type="number" id="cust-weight" oninput="calculateMetabolism(); generateSomaticReport();" placeholder="kg" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">ส่วนสูง (ซม.)</label>
+                            <input type="number" id="cust-height" oninput="calculateMetabolism(); generateSomaticReport();" placeholder="cm" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div class="col-span-2 sm:col-span-1">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">ระดับการออกกำลังกาย / กิจกรรม</label>
+                            <select id="cust-activity" onchange="calculateMetabolism(); generateSomaticReport();" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                                <option value="1.2">นั่งทำงานอยู่กับที่ ไม่ค่อยออกกำลังกาย</option>
+                                <option value="1.375" selected>ออกกำลังกายเบาๆ (1-3 วัน/สัปดาห์)</option>
+                                <option value="1.55">ออกกำลังกายปานกลาง (3-5 วัน/สัปดาห์)</option>
+                                <option value="1.725">ออกกำลังกายหนัก (6-7 วัน/สัปดาห์)</option>
+                                <option value="1.9">ออกกำลังกายหนักมาก เป็นนักกีฬา/ทำงานใช้แรงงาน</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">เบอร์โทรศัพท์</label>
+                            <input type="text" id="cust-phone" placeholder="0xx-xxxxxxx" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Line ID / ช่องทางติดต่อโซเชียล</label>
+                            <input type="text" id="cust-social" placeholder="Line, Facebook, IG" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition">
+                        </div>
+                        <div class="col-span-2 sm:col-span-3">
+                            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">เป้าหมายด้านรูปร่างและสุขภาพ (Body & Health Goals)</label>
+                            <textarea id="cust-goal" rows="2" oninput="generateSomaticReport();" placeholder="เช่น ต้องการลดไขมันสะสมรอบเอว, เพิ่มมวลกล้ามเนื้อสร้างร่อง 11, ปรับสัดส่วนต้นแขนต้นขา หรือฟื้นฟูระบบเผาผลาญ" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-800/60">
+                        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">ดัชนีมวลกาย (BMI)</span>
+                            <span id="calc-bmi" class="text-lg font-black text-white block mt-0.5">-</span>
+                            <span id="calc-bmi-status" class="text-[9px] font-bold block text-slate-400 truncate mt-0.5">รอข้อมูล</span>
+                        </div>
+                        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">น้ำหนักที่เหมาะสม (IBW)</span>
+                            <span id="calc-ibw" class="text-lg font-black text-teal-400 block mt-0.5">-</span>
+                            <span class="text-[9px] font-bold text-slate-500 block mt-0.5">กก. (ช่วงสากล)</span>
+                        </div>
+                        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">พลังงานพื้นฐาน (BMR)</span>
+                            <span id="calc-bmr" class="text-lg font-black text-indigo-400 block mt-0.5">-</span>
+                            <span class="text-[9px] font-bold text-slate-500 block mt-0.5">kcal / วัน</span>
+                        </div>
+                        <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">พลังงานที่ใช้จริง (TDEE)</span>
+                            <span id="calc-tdee" class="text-lg font-black text-orange-400 block mt-0.5">-</span>
+                            <span class="text-[9px] font-bold text-slate-500 block mt-0.5">kcal / วัน</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-800/40">
+                        <div class="bg-emerald-950/30 border border-emerald-900/60 p-3 rounded-xl flex items-center justify-between">
+                            <div class="text-left">
+                                <span class="text-[10px] uppercase font-bold text-emerald-400 flex items-center gap-1">
+                                    <span class="material-icons text-[12px]">trending_down</span> เป้าหมายลดน้ำหนัก/ลดไขมัน
+                                </span>
+                                <span class="text-[9px] text-slate-400 block mt-0.5">Caloric Deficit (-15% ถึง -20%)</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="calc-weight-loss" class="text-lg font-black text-emerald-400 block">-</span>
+                                <span class="text-[9px] text-slate-500 block">kcal / วัน</span>
+                            </div>
+                        </div>
+                        <div class="bg-blue-950/30 border border-blue-900/60 p-3 rounded-xl flex items-center justify-between">
+                            <div class="text-left">
+                                <span class="text-[10px] uppercase font-bold text-blue-400 flex items-center gap-1">
+                                    <span class="material-icons text-[12px]">trending_up</span> เป้าหมายเพิ่มน้ำหนัก/สร้างกล้ามเนื้อ
+                                </span>
+                                <span class="text-[9px] text-slate-400 block mt-0.5">Caloric Surplus (+10% ถึง +15%)</span>
+                            </div>
+                            <div class="text-right">
+                                <span id="calc-weight-gain" class="text-lg font-black text-blue-400 block">-</span>
+                                <span class="text-[9px] text-slate-500 block">kcal / วัน</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm">
+                    
+                    <div class="flex border-b border-slate-800 mb-6 p-1 bg-slate-950/80 rounded-xl gap-1">
+                        <button onclick="switchMasterTab('vitality')" id="tab-btn-vitality" class="flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2">
+                            <span class="material-icons text-sm">favorite</span>
+                            WHEEL 1: PURE VITALITY (พลังชีวิต)
+                        </button>
+                        <button onclick="switchMasterTab('structure')" id="tab-btn-structure" class="flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2">
+                            <span class="material-icons text-sm">accessibility_new</span>
+                            WHEEL 2: BODY PROPORTIONS (รูปร่างสัดส่วน)
+                        </button>
+                    </div>
+
+                    <div id="sliders-container" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                    </div>
+                </section>
+            </div>
+
+            <div class="lg:col-span-5 lg:sticky lg:top-6 space-y-6">
+                
+                <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                    <div class="absolute top-3 left-4 flex items-center gap-2 z-10">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span class="text-[10px] font-mono tracking-wider text-slate-400 uppercase" id="canvas-status-indicator">VITALITY VECTOR ACTIVE</span>
+                    </div>
+                    
+                    <div class="w-full flex justify-center items-center py-2">
+                        <canvas id="masterCanvas" class="max-w-full aspect-square filter drop-shadow-[0_0_20px_rgba(79,70,229,0.15)] transition-all duration-300"></canvas>
+                    </div>
+                    
+                    <div class="w-full grid grid-cols-3 gap-2 mt-2 pt-4 border-t border-slate-800/60 text-center">
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">คะแนนเฉลี่ยรวม</span>
+                            <span class="text-lg font-black text-white tracking-tight" id="stat-avg">0.0</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">ส่วนที่สมบูรณ์สุด</span>
+                            <span class="text-xs font-bold text-indigo-400 block truncate mt-1" id="stat-max">-</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase">ส่วนที่ต้องเร่งปรับปรุง</span>
+                            <span class="text-xs font-bold text-rose-400 block truncate mt-1" id="stat-min">-</span>
+                        </div>
+                    </div>
+                    
+                    <div id="zone-summary-container" class="w-full grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-slate-800/60 text-center">
+                    </div>
+                </section>
+
+                <section class="bg-slate-900/40 border border-slate-800 rounded-2xl p-5 backdrop-blur-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <div>
+                            <h4 class="font-extrabold text-sm flex items-center gap-2 text-indigo-400" id="export-log-title">
+                                <span class="material-icons">text_snippet</span>
+                                รายงานผลวินิจฉัยสุขภาพและรูปร่าง (Somatic & Shape Report Log)
+                            </h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">คัดลอกหรือดาวน์โหลดรายละเอียดผลคะแนนเพื่อนำไปใช้วางแผนโภชนาการ ปรับสัดส่วน หรือจัดตารางออกกำลังกาย</p>
+                        </div>
+                        
+                        <div class="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
+                            <button onclick="copyMasterSomaticReport()" id="copyMasterBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-[11px] rounded-xl border border-slate-700 transition-all duration-200 flex items-center gap-1 justify-center flex-1 sm:flex-none">
+                                <span class="material-icons text-[14px]">content_copy</span>
+                                คัดลอก
+                            </button>
+                            <button onclick="downloadSomaticPackageReport()" id="downloadPackageBtn" class="px-3 py-2 bg-gradient-to-r from-indigo-500 to-teal-500 hover:from-indigo-600 hover:to-teal-600 text-white font-bold text-[11px] rounded-xl shadow-lg transition-all duration-200 flex items-center gap-1 justify-center flex-1 sm:flex-none">
+                                <span class="material-icons text-[14px]">download</span>
+                                เซฟรายงาน (PNG)
+                            </button>
+                            <!-- ปุ่มส่งอีเมลที่รวมฟังก์ชันดาวน์โหลดอัตโนมัติไว้ด้วยกัน -->
+                            <button onclick="sendReportViaMailto()" class="px-3 py-2 bg-blue-900/50 hover:bg-blue-800/80 text-blue-300 font-bold text-[11px] rounded-xl border border-blue-800/70 transition-all duration-200 flex items-center gap-1 justify-center w-full sm:w-auto mt-2 sm:mt-0">
+                                <span class="material-icons text-[14px]">mail</span>
+                                ส่งเข้าอีเมล
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <textarea id="master-report-textarea" readonly rows="12" class="w-full bg-slate-950 font-mono text-xs text-emerald-400 border border-slate-800 p-4 rounded-xl focus:outline-none focus:border-slate-700 leading-relaxed resize-none shadow-inner select-all"></textarea>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const vitalityDimensions = [
+            { id: 'v1_energy', label: '1. Daily Energy (พลังงานระหว่างวัน)', zone: 'physic', desc: 'ตื่นมาแล้วสดชื่น มีแรงทำงานยาวๆ ถึงเย็น โดยไม่ต้องพึ่งกาแฟหรือขนมหวานประคอง' },
+            { id: 'v2_stamina', label: '2. Stamina & Endurance (ความอึดถึกทน)', zone: 'physic', desc: 'เดินขึ้นบันได ขึ้นเนิน หรือยกของหนักแล้วไม่หอบเหนื่อยง่าย หัวใจไม่เต้นรัวเป็นกลอง' },
+            { id: 'v3_sleep_eff', label: '3. Sleep Efficiency (คุณภาพการนอนหลับ)', zone: 'physic', desc: 'หัวถึงหมอนแล้วหลับง่ายใน 15 นาที หลับสนิทไม่ตื่นกลางดึกบ่อยๆ' },
+            { id: 'v4_recovery', label: '4. Wakeup Recovery (ความสดชื่นหลังตื่น)', zone: 'physic', desc: 'ลุกจากเตียงแล้วตัวเบา สมองโล่งทันที ไม่มีอาการงัวเงียตื้อหัว หรือปวดเมื่อยล้าตัว' },
+            { id: 'v5_digestion', label: '5. Digest Power (ระบบย่อยอาหาร)', zone: 'organic', desc: 'กินอาหารแล้วย่อยสบาย ท้องไม่เบน ไม่ตึงแน่น ไม่มีลมแก๊สค้างในกระเพาะจนอึดอัด' },
+            { id: 'v6_elimination', label: '6. Gut Elimination (การขับถ่ายของเสีย)', zone: 'organic', desc: 'ถ่ายง่ายทุกเช้า เป็นเวลา ไม่ผูก ไม่ท้องเสีย ถ่ายสุดแบบสบายท้องไม่ต้องเบ่งเค้น' },
+            { id: 'v7_immunity', label: '7. Immune Resilience (ความแข็งแรงภูมิคุ้มกัน)', zone: 'organic', desc: 'ร่างกายทนแดดทนฝน ไม่จาม ไม่เป็นหวัดหรือภูมิแพ้ง่ายๆ เมื่ออากาศเปลี่ยน' },
+            { id: 'v8_hydration', label: '8. Cellular Hydration (ความชุ่มชื้นในร่างกาย)', zone: 'organic', desc: 'ผิวพรรณชุ่มฉ่ำไม่แห้งสาก ปากไม่แห้งแตก ปัสสาวะมีสีเหลืองใส ไม่ร้อนในง่าย' },
+            { id: 'v9_focus', label: '9. Mental Focus (สมาธิและการจดจ่อ)', zone: 'neural', desc: 'สมองแล่นไว คิดงานจบเป็นชิ้นๆ ได้ต่อเนื่อง ไม่วอกแวกง่าย ไม่ลืมเรื่องสำคัญ' },
+            { id: 'v10_stress', label: '10. Stress Control (ความทนทานต่อแรงกดดัน)', zone: 'neural', desc: 'เมื่อเจอปัญหาหน้างาน ยังนิ่งและคุมอารมณ์ได้ดี ไม่สติแตกหรือวิตกกังวลจนใจสั่น' },
+            { id: 'v11_mood', label: '11. Emotional Balance (ความเสถียรทางอารมณ์)', zone: 'neural', desc: 'อารมณ์คงที่ แจ่มใสทั้งวัน ไม่หงุดหงิดง่าย เหวี่ยงวีน หรืออารมณ์ดิ่งสวิงไปมา' },
+            { id: 'v12_sensory', label: '12. Sensory Relaxation (ความผ่อนคลายระบบประสาท)', zone: 'neural', desc: 'จ้องหน้าจอหรือฟังเสียงทั้งวันแล้วตาไม่ล้า สมองไม่เบลอ ไม่มีอาการเกร็งตึงท้ายทอย' }
+        ];
+
+        const structureDimensions = [
+            { id: 'b1_visceral', label: '1. Visceral Fat Index (ไขมันช่องท้อง)', zone: 'fat', desc: 'ความปลอดภัยของไขมันที่เกาะตับและพุง (คะแนนยิ่งสูง = ท้องยิ่งลีน ปลอดภัย ไร้พุงใน)' },
+            { id: 'b2_subcutaneous', label: '2. Under-skin Fat (ไขมันใต้ผิวหนังรวม)', zone: 'fat', desc: 'ชั้นไขมันนิ่มๆ ที่หยิบติดมือ (คะแนนยิ่งสูง = ชั้นไขมันบาง เนื้อแน่น จับแล้วไม่ย้วยเหลว)' },
+            { id: 'b3_waistline', label: '3. Waistline Ratio (รูปทรงเอวและหน้าท้อง)', zone: 'fat', desc: 'หน้าท้องแบนราบ ใส่เสื้อผ้าแล้วดูสมส่วน ไม่มีเนื้อล้นปลิ้นพาดขอบกางเกง' },
+            { id: 'b4_cellulite', label: '4. Cellulite Reduction (ความเรียบเนียนผิว)', zone: 'fat', desc: 'ผิวบริเวณต้นขา สะโพก ต้นแขน เรียบเนียนเสมอกัน ไม่เป็นคลื่น ผิวไม่เป็นเปลือกส้ม' },
+            { id: 'b5_skeletal_m', label: '5. Skeletal Muscle (มวลกล้ามเนื้อโครงร่าง)', zone: 'muscle', desc: 'ร่างกายมีเนื้อกล้ามเนื้อพอดี ดูมีทรวดทรงบ่า-หลัง-ขา ไม่ผอมแห้งแรงน้อย' },
+            { id: 'b6_tone', label: '6. Firmness & Tone (ความแน่นกระชับกล้ามเนื้อ)', zone: 'muscle', desc: 'เนื้อตัวจับแล้วเด้งสู้มือ เวลาโบกมือหรือขยับตัว เนื้อใต้แขนและขาไม่สั่นเป็นคลื่น' },
+            { id: 'b7_upper_prop', label: '7. Upper Body Proportion (สัดส่วนท่อนบน)', zone: 'shape', desc: 'ช่วงอก บ่า หลัง และต้นแขน ดูลีน เพรียวสวย ไม่ดูหนาตัน หรือดูตัวใหญ่ล่ำช่วงบน' },
+            { id: 'b8_lower_prop', label: '8. Lower Body Proportion (สัดส่วนท่อนล่าง)', zone: 'shape', desc: 'ช่วงสะโพก ต้นขา และน่อง ดูเพรียวได้รูป ไม่ดูบวมหนาหนืด ขาไม่เบียดกันเวลาเดิน' },
+            { id: 'b9_water', label: '9. Body Water Balance (สมดุลน้ำ-อาการบวมน้ำ)', zone: 'shape', desc: 'ร่างกายขับน้ำดี ตื่นนอนตอนเช้าหรือตกเย็นแล้วหน้าไม่ตุ่ย แหวนไม่คับ นิ้วเท้าไม่บวม' },
+            { id: 'b10_bmr', label: '10. BMR Efficiency (ความแรงของเตาเผาฮอร์โมน)', zone: 'shape', desc: 'ระบบเผาผลาญดี กินปกติแล้วน้ำหนักคงที่ ไม่อ้วนง่ายประเภทแค่นอนดมกลิ่นก็อ้วน' },
+            { id: 'b11_metabolic_a', label: '11. Metabolic Age (อายุเซลล์ภายใน)', zone: 'shape', desc: 'ความฟิตของร่างกายภายใน (คะแนนยิ่งสูง = เซลล์เด็ก กระปรี้กระเปร่ากว่าอายุจริง)' },
+            { id: 'b12_frame_sym', label: '12. Silhouette Symmetry (ความสมมาตรของหุ่น)', zone: 'shape', desc: 'เวลายืนส่องกระจกเงา รูปร่างซ้ายขวาดูเท่ากัน มีเส้นส่วนโค้งเว้าเอวคอดชัดเจน' }
+        ];
+
+        let calculatedMetrics = { bmi: 0, bmiStatus: '', ibw: 0, bmr: 0, tdee: 0, weightLossTarget: 0, weightGainTarget: 0 };
+
+        const simulatedProfiles = {
+            default: {
+                vitality: { v1_energy:5, v2_stamina:5, v3_sleep_eff:5, v4_recovery:5, v5_digestion:5, v6_elimination:5, v7_immunity:5, v8_hydration:5, v9_focus:5, v10_stress:5, v11_mood:5, v12_sensory:5 },
+                structure: { b1_visceral:5, b2_subcutaneous:5, b3_waistline:5, b4_cellulite:5, b5_skeletal_m:5, b6_tone:5, b7_upper_prop:5, b8_lower_prop:5, b9_water:5, b10_bmr:5, b11_metabolic_a:5, b12_frame_sym:5 }
+            },
+            athlete: {
+                vitality: { v1_energy:9, v2_stamina:9, v3_sleep_eff:8, v4_recovery:8, v5_digestion:7, v6_elimination:8, v7_immunity:9, v8_hydration:8, v9_focus:9, v10_stress:8, v11_mood:8, v12_sensory:7 },
+                structure: { b1_visceral:9, b2_subcutaneous:8, b3_waistline:9, b4_cellulite:9, b5_skeletal_m:9, b6_tone:9, b7_upper_prop:8, b8_lower_prop:8, b9_water:8, b10_bmr:9, b11_metabolic_a:9, b12_frame_sym:9 }
+            },
+            fatigue: {
+                vitality: { v1_energy:3, v2_stamina:3, v3_sleep_eff:4, v4_recovery:3, v5_digestion:4, v6_elimination:3, v7_immunity:4, v8_hydration:4, v9_focus:4, v10_stress:3, v11_mood:4, v12_sensory:3 },
+                structure: { b1_visceral:3, b2_subcutaneous:4, b3_waistline:3, b4_cellulite:4, b5_skeletal_m:3, b6_tone:2, b7_upper_prop:4, b8_lower_prop:3, b9_water:3, b10_bmr:2, b11_metabolic_a:3, b12_frame_sym:5 }
+            },
+            structural_issue: {
+                vitality: { v1_energy:5, v2_stamina:4, v3_sleep_eff:5, v4_recovery:4, v5_digestion:5, v6_elimination:5, v7_immunity:5, v8_hydration:4, v9_focus:6, v10_stress:5, v11_mood:6, v12_sensory:6 },
+                structure: { b1_visceral:2, b2_subcutaneous:2, b3_waistline:2, b4_cellulite:3, b5_skeletal_m:5, b6_tone:4, b7_upper_prop:3, b8_lower_prop:3, b9_water:3, b10_bmr:3, b11_metabolic_a:2, b12_frame_sym:5 }
+            }
+        };
+
+        let activeMasterTab = 'vitality';
+        let stateVitality = {};
+        let stateStructure = {};
+
+        function initMasterState() {
+            vitalityDimensions.forEach(d => stateVitality[d.id] = 5);
+            structureDimensions.forEach(d => stateStructure[d.id] = 5);
+        }
+
+        function getScoreMeaning(score) {
+            if (score <= 3) return '<span class="text-rose-400">🔴 วิกฤต / ควรเร่งแก้ไข (Critical)</span>';
+            if (score <= 5) return '<span class="text-orange-400">🟠 ต่ำกว่าเกณฑ์ / เริ่มมีปัญหา (Suboptimal)</span>';
+            if (score <= 7) return '<span class="text-yellow-400">🟡 ปานกลาง / ทั่วไป (Average)</span>';
+            if (score <= 9) return '<span class="text-emerald-400">🟢 ดี / สุขภาพแข็งแรง (Good)</span>';
+            return '<span class="text-indigo-400">🔵 สมบูรณ์แบบ / ยอดเยี่ยม (Optimal)</span>';
+        }
+
+        function calculateMetabolism() {
+            const weight = parseFloat(document.getElementById('cust-weight').value);
+            const height = parseFloat(document.getElementById('cust-height').value);
+            const age = parseInt(document.getElementById('cust-age').value);
+            const gender = document.getElementById('cust-gender').value;
+            const activityMultiplier = parseFloat(document.getElementById('cust-activity').value);
+
+            if (!weight || !height || !age) {
+                document.getElementById('calc-bmi').innerText = '-';
+                document.getElementById('calc-bmi-status').innerText = 'รอข้อมูล';
+                document.getElementById('calc-bmi-status').className = "text-[9px] font-bold block text-slate-400 truncate mt-0.5";
+                document.getElementById('calc-ibw').innerText = '-';
+                document.getElementById('calc-bmr').innerText = '-';
+                document.getElementById('calc-tdee').innerText = '-';
+                document.getElementById('calc-weight-loss').innerText = '-';
+                document.getElementById('calc-weight-gain').innerText = '-';
+                return;
+            }
+
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            calculatedMetrics.bmi = bmi.toFixed(1);
+
+            let bmiStatus = '';
+            let bmiClass = '';
+            if (bmi < 18.5) { bmiStatus = 'น้ำหนักน้อย/ผอม'; bmiClass = 'text-sky-400'; }
+            else if (bmi < 23.0) { bmiStatus = 'น้ำหนักปกติ/สมส่วน'; bmiClass = 'text-emerald-400'; }
+            else if (bmi < 25.0) { bmiStatus = 'น้ำหนักเกิน (Overweight)'; bmiClass = 'text-yellow-400'; }
+            else if (bmi < 30.0) { bmiStatus = 'โรคอ้วนระดับ 1'; bmiClass = 'text-orange-400'; }
+            else { bmiStatus = 'โรคอ้วนระดับ 2 (อันตราย)'; bmiClass = 'text-red-400'; }
+
+            calculatedMetrics.bmiStatus = bmiStatus;
+            document.getElementById('calc-bmi').innerText = calculatedMetrics.bmi;
+            document.getElementById('calc-bmi-status').innerText = bmiStatus;
+            document.getElementById('calc-bmi-status').className = `text-[9px] font-bold block truncate mt-0.5 ${bmiClass}`;
+
+            let ibw = gender === 'male' ? (height - 100) * 0.9 : (height - 100) * 0.85;
+            calculatedMetrics.ibw = ibw.toFixed(1);
+            document.getElementById('calc-ibw').innerText = calculatedMetrics.ibw;
+
+            let bmr = gender === 'male' ? (10 * weight) + (6.25 * height) - (5 * age) + 5 : (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            calculatedMetrics.bmr = Math.round(bmr);
+            document.getElementById('calc-bmr').innerText = calculatedMetrics.bmr;
+
+            let tdee = Math.round(bmr * activityMultiplier);
+            calculatedMetrics.tdee = tdee;
+            document.getElementById('calc-tdee').innerText = calculatedMetrics.tdee;
+
+            let lossTarget = Math.round(tdee * 0.80); 
+            if (lossTarget < bmr) { lossTarget = calculatedMetrics.bmr; } 
+            calculatedMetrics.weightLossTarget = lossTarget;
+            document.getElementById('calc-weight-loss').innerText = calculatedMetrics.weightLossTarget;
+
+            calculatedMetrics.weightGainTarget = Math.round(tdee * 1.12);
+            document.getElementById('calc-weight-gain').innerText = calculatedMetrics.weightGainTarget;
+        }
+
+        function switchMasterTab(tabTarget) {
+            activeMasterTab = tabTarget;
+            const btnVitality = document.getElementById('tab-btn-vitality');
+            const btnStructure = document.getElementById('tab-btn-structure');
+            const indicatorText = document.getElementById('canvas-status-indicator');
+            
+            if (activeMasterTab === 'vitality') {
+                btnVitality.className = "flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-950";
+                btnStructure.className = "flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40";
+                indicatorText.innerText = "12-AXIS VITALITY VECTOR ACTIVE";
+                indicatorText.className = "text-[10px] font-mono tracking-wider text-indigo-400 uppercase";
+                renderSliders(vitalityDimensions, stateVitality);
+            } else {
+                btnStructure.className = "flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-md shadow-red-950";
+                btnVitality.className = "flex-1 py-2.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 bg-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/40";
+                indicatorText.innerText = "12-AXIS BODY PROPORTIONS ACTIVE";
+                indicatorText.className = "text-[10px] font-mono tracking-wider text-orange-400 uppercase";
+                renderSliders(structureDimensions, stateStructure);
+            }
+            drawMasterRadar();
+            generateSomaticReport();
+        }
+
+        function renderSliders(dimensionsArray, stateObject) {
+            const container = document.getElementById('sliders-container');
+            container.innerHTML = '';
+            
+            dimensionsArray.forEach(dim => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "p-3 bg-slate-950/60 rounded-xl border border-slate-800/60 hover:border-slate-700/60 transition-all duration-150";
+                
+                let badgeColor = "bg-slate-800 text-slate-300";
+                if (dim.zone === 'physic') badgeColor = "bg-teal-950/80 text-teal-300 border border-teal-800/60";
+                if (dim.zone === 'organic') badgeColor = "bg-emerald-950/80 text-emerald-300 border border-emerald-800/60";
+                if (dim.zone === 'neural') badgeColor = "bg-indigo-950/80 text-indigo-300 border border-indigo-800/60";
+                if (dim.zone === 'fat') badgeColor = "bg-orange-950/80 text-orange-300 border border-orange-800/60";
+                if (dim.zone === 'muscle') badgeColor = "bg-rose-950/80 text-rose-300 border border-rose-800/60";
+                if (dim.zone === 'shape') badgeColor = "bg-blue-950/80 text-blue-300 border border-blue-800/60";
+
+                const currentVal = stateObject[dim.id];
+
+                wrapper.innerHTML = `
+                    <div class="flex justify-between items-start gap-2 mb-1">
+                        <div>
+                            <span class="text-[9px] font-extrabold px-1 py-0.2 rounded uppercase tracking-wider ${badgeColor}">${dim.zone}</span>
+                            <h5 class="text-xs font-bold text-slate-200 mt-1 inline-block">${dim.label}</h5>
+                            <p class="text-[11px] text-slate-400 leading-relaxed font-normal">${dim.desc}</p>
+                        </div>
+                        <span id="val-display-${dim.id}" class="text-xs font-mono font-black px-2 py-0.5 bg-slate-900 border border-slate-800 text-slate-100 rounded-lg min-w-[28px] text-center shadow-inner">${currentVal}</span>
+                    </div>
+                    <div class="flex items-center gap-3 mt-2">
+                        <span class="text-[9px] font-mono font-bold text-slate-600">0</span>
+                        <input type="range" min="0" max="10" step="1" value="${currentVal}" 
+                            oninput="updateDimensionValue('${dim.id}', this.value)" 
+                            class="w-full h-1 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-indigo-500 focus:outline-none">
+                        <span class="text-[9px] font-mono font-bold text-slate-600">10</span>
+                    </div>
+                    <div class="mt-1.5 flex justify-between items-center border-t border-slate-800/40 pt-1.5">
+                        <span class="text-[10px] text-slate-500">ความหมาย:</span>
+                        <span id="meaning-${dim.id}" class="text-[10px] font-bold tracking-wide">${getScoreMeaning(currentVal)}</span>
+                    </div>
+                `;
+                container.appendChild(wrapper);
+            });
+        }
+
+        function updateDimensionValue(id, val) {
+            const parsedVal = parseInt(val, 10);
+            if (activeMasterTab === 'vitality') {
+                stateVitality[id] = parsedVal;
+            } else {
+                stateStructure[id] = parsedVal;
+            }
+            
+            document.getElementById(`val-display-${id}`).innerText = parsedVal;
+            
+            const meaningSpan = document.getElementById(`meaning-${id}`);
+            if (meaningSpan) {
+                meaningSpan.innerHTML = getScoreMeaning(parsedVal);
+            }
+
+            drawMasterRadar();
+            generateSomaticReport();
+        }
+
+        function resizeMasterCanvas() {
+            const canvas = document.getElementById('masterCanvas');
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth - 16, 440);
+            
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+            
+            const scale = window.devicePixelRatio || 1;
+            canvas.width = size * scale;
+            canvas.height = size * scale;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+            
+            drawMasterRadar();
+        }
+
+        function executeRadarDrawing(ctx, canvasWidth, canvasHeight, currentTab, vitalityData, structureData) {
+            const centerX = canvasWidth / 2;
+            const centerY = canvasHeight / 2;
+            const maxRadius = Math.min(canvasWidth, canvasHeight) * 0.35;
+            
+            const dims = currentTab === 'vitality' ? vitalityDimensions : structureDimensions;
+            const state = currentTab === 'vitality' ? vitalityData : structureData;
+            const totalAxes = dims.length;
+
+            const config = currentTab === 'vitality' ? {
+                primary: '#6366f1', secondary: 'rgba(99, 102, 241, 0.15)'
+            } : {
+                primary: '#ea580c', secondary: 'rgba(234, 88, 12, 0.15)'
+            };
+
+            const zoneColorsHex = {
+                physic: '#2dd4bf', organic: '#34d399', neural: '#818cf8',
+                fat: '#fb923c', muscle: '#f87171', shape: '#60a5fa'
+            };
+
+            const webLevels = 5; 
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.35)';
+            ctx.lineWidth = 0.8;
+            for (let l = 1; l <= webLevels; l++) {
+                const currentLevelRadius = maxRadius * (l / webLevels);
+                ctx.beginPath();
+                for (let i = 0; i < totalAxes; i++) {
+                    const angle = (i * 2 * Math.PI) / totalAxes - Math.PI / 2;
+                    const x = centerX + currentLevelRadius * Math.cos(angle);
+                    const y = centerY + currentLevelRadius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+                
+                ctx.fillStyle = '#475569';
+                ctx.font = 'bold 7px monospace';
+                ctx.fillText((l * 2).toString(), centerX + 3, centerY - currentLevelRadius + 3);
+            }
+
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.5)';
+            ctx.lineWidth = 0.8;
+            for (let i = 0; i < totalAxes; i++) {
+                const angle = (i * 2 * Math.PI) / totalAxes - Math.PI / 2;
+                const outerX = centerX + maxRadius * Math.cos(angle);
+                const outerY = centerY + maxRadius * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(outerX, outerY);
+                ctx.stroke();
+
+                const textDistance = maxRadius + 12;
+                const lx = centerX + textDistance * Math.cos(angle);
+                const ly = centerY + textDistance * Math.sin(angle);
+                
+                ctx.fillStyle = zoneColorsHex[dims[i].zone] || '#94a3b8';
+                ctx.font = '700 9px Sarabun, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                if (Math.abs(Math.cos(angle)) > 0.1) {
+                    ctx.textAlign = Math.cos(angle) > 0 ? 'left' : 'right';
+                }
+                if (Math.abs(Math.sin(angle)) > 0.8) {
+                    ctx.textBaseline = Math.sin(angle) > 0 ? 'top' : 'bottom';
+                }
+
+                const shortLabel = dims[i].label.split('. ')[1].split(' (')[0];
+                ctx.fillText(`${i+1}.${shortLabel}`, lx, ly);
+            }
+
+            ctx.beginPath();
+            for (let i = 0; i < totalAxes; i++) {
+                const score = state[dims[i].id];
+                const distanceRatio = score / 10;
+                const angle = (i * 2 * Math.PI) / totalAxes - Math.PI / 2;
+                const x = centerX + maxRadius * distanceRatio * Math.cos(angle);
+                const y = centerY + maxRadius * distanceRatio * Math.sin(angle);
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = config.secondary;
+            ctx.fill();
+            ctx.strokeStyle = config.primary;
+            ctx.lineWidth = 2.2;
+            ctx.stroke();
+
+            for (let i = 0; i < totalAxes; i++) {
+                const score = state[dims[i].id];
+                const distanceRatio = score / 10;
+                const angle = (i * 2 * Math.PI) / totalAxes - Math.PI / 2;
+                const x = centerX + maxRadius * distanceRatio * Math.cos(angle);
+                const y = centerY + maxRadius * distanceRatio * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
+                ctx.fillStyle = zoneColorsHex[dims[i].zone] || '#ffffff';
+                ctx.fill();
+                ctx.strokeStyle = config.primary;
+                ctx.lineWidth = 1.2;
+                ctx.stroke();
+            }
+        }
+
+        function drawMasterRadar() {
+            const canvas = document.getElementById('masterCanvas');
+            if (!canvas || canvas.width === 0) return;
+            
+            const ctx = canvas.getContext('2d');
+            const displaySize = canvas.width / (window.devicePixelRatio || 1);
+            
+            ctx.clearRect(0, 0, displaySize, displaySize);
+            
+            executeRadarDrawing(ctx, displaySize, displaySize, activeMasterTab, stateVitality, stateStructure);
+            
+            const dims = activeMasterTab === 'vitality' ? vitalityDimensions : structureDimensions;
+            const state = activeMasterTab === 'vitality' ? stateVitality : stateStructure;
+            updateStatistics(dims, state);
+        }
+
+        function updateStatistics(dims, state) {
+            let total = 0;
+            let maxDim = dims[0];
+            let minDim = dims[0];
+            let zoneStats = {};
+            
+            dims.forEach(d => {
+                const score = state[d.id];
+                total += score;
+                if (score > state[maxDim.id]) maxDim = d;
+                if (score < state[minDim.id]) minDim = d;
+
+                if (!zoneStats[d.zone]) {
+                    zoneStats[d.zone] = { total: 0, count: 0 };
+                }
+                zoneStats[d.zone].total += score;
+                zoneStats[d.zone].count += 1;
+            });
+
+            const avg = (total / dims.length).toFixed(1);
+            document.getElementById('stat-avg').innerText = avg;
+            document.getElementById('stat-max').innerText = maxDim.label.split('. ')[1].split(' (')[0];
+            document.getElementById('stat-min').innerText = state[minDim.id] <= 4 ? minDim.label.split('. ')[1].split(' (')[0] : 'ไม่มี (ปกติ)';
+
+            const zoneContainer = document.getElementById('zone-summary-container');
+            if(zoneContainer) {
+                zoneContainer.innerHTML = '';
+                
+                const zoneNames = {
+                    physic: 'กายภาพ (Physic)', organic: 'อวัยวะ (Organic)', neural: 'ระบบประสาท (Neural)',
+                    fat: 'ไขมัน (Fat)', muscle: 'กล้ามเนื้อ (Muscle)', shape: 'สัดส่วน (Shape)'
+                };
+                
+                const zoneColorsTailwind = {
+                    physic: 'text-teal-400', organic: 'text-emerald-400', neural: 'text-indigo-400',
+                    fat: 'text-orange-400', muscle: 'text-red-400', shape: 'text-blue-400'
+                };
+
+                for (const [zone, data] of Object.entries(zoneStats)) {
+                    const zoneAvg = (data.total / data.count).toFixed(1);
+                    const colorClass = zoneColorsTailwind[zone] || 'text-slate-400';
+                    const label = zoneNames[zone] || zone.toUpperCase();
+                    
+                    zoneContainer.innerHTML += `
+                        <div class="bg-slate-900/50 border border-slate-800/80 p-2 rounded-xl flex flex-col justify-center transition-all hover:bg-slate-800/50">
+                            <span class="block text-[9px] font-bold text-slate-500 uppercase truncate mb-0.5">${label}</span>
+                            <span class="text-xl font-black ${colorClass} block">${zoneAvg}</span>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function generateSomaticReport() {
+            const name = document.getElementById('cust-name').value.trim() || 'ไม่ระบุชื่อผู้รับบริการ';
+            const genderText = document.getElementById('cust-gender').value === 'male' ? 'ชาย' : 'หญิง';
+            const age = document.getElementById('cust-age').value.trim() || '-';
+            const weight = document.getElementById('cust-weight').value.trim() || '-';
+            const height = document.getElementById('cust-height').value.trim() || '-';
+            const phone = document.getElementById('cust-phone').value.trim() || '-';
+            const social = document.getElementById('cust-social').value.trim() || '-';
+            const goal = document.getElementById('cust-goal').value.trim() || 'ไม่ได้ระบุเป้าหมายชัดเจน';
+            const dateTimestamp = new Date().toLocaleString('th-TH');
+
+            const dims = activeMasterTab === 'vitality' ? vitalityDimensions : structureDimensions;
+            const state = activeMasterTab === 'vitality' ? stateVitality : stateStructure;
+            const systemTitle = activeMasterTab === 'vitality' ? 'PURE VITALITY MULTI-AXIS SYSTEM' : 'BODY PROPORTIONS & METABOLIC COMPOSITION';
+
+            let report = `====================================================================\n`;
+            report += `    SOMATIC INTEGRATED REPORT: VITALITY, SHAPE & METABOLISM\n`;
+            report += `====================================================================\n`;
+            report += `วัน-เวลาตรวจวิเคราะห์: ${dateTimestamp}\n`;
+            report += `ระบบโครงสร้างข้อมูล: ${systemTitle}\n`;
+            report += `--------------------------------------------------------------------\n`;
+            report += `[ข้อมูลผู้รับการประเมิน / CLIENT METRICS]\n`;
+            report += `ชื่อ-นามสกุล: ${name} | เพศ: ${genderText} | อายุ: ${age} ปี\n`;
+            report += `น้ำหนัก: ${weight} กก. | ส่วนสูง: ${height} ซม.\n`;
+            report += `เบอร์โทรศัพท์: ${phone} | ช่องทางติดต่อ: ${social}\n`;
+            report += `เป้าหมายผู้รับบริการ: ${goal}\n`;
+            report += `--------------------------------------------------------------------\n`;
+            report += `[ผลการวิเคราะห์ดัชนีพลังงานและการเผาผลาญ / METABOLIC ANALYTICS]\n`;
+            
+            if(calculatedMetrics.bmi > 0) {
+                report += `- ดัชนีมวลกาย (BMI): ${calculatedMetrics.bmi} (${calculatedMetrics.bmiStatus})\n`;
+                report += `- น้ำหนักตัวที่เหมาะสมสากล (IBW): ${calculatedMetrics.ibw} กก.\n`;
+                report += `- อัตราการเผาผลาญพื้นฐาน (BMR): ${calculatedMetrics.bmr} kcal/วัน\n`;
+                report += `- พลังงานที่ใช้จริงทั้งหมด (TDEE): ${calculatedMetrics.tdee} kcal/วัน\n`;
+                report += `\n[เป้าหมายการปรับปริมาณพลังงานที่แนะนำ / TARGET CALORIC GUIDE]\n`;
+                report += `🔥 กรณีต้องการลดน้ำหนัก / ลดไขมัน (Caloric Deficit):\n`;
+                report += `  * ควรรับประทานอาหารรวมให้ได้ประมาณ: ${calculatedMetrics.weightLossTarget} kcal / วัน\n`;
+                if(calculatedMetrics.weightLossTarget === calculatedMetrics.bmr) {
+                    report += `    (⚠️ หมายเหตุ: คำนวณตามเกณฑ์ที่ปลอดภัยสูงสุดไม่ต่ำกว่า BMR เพื่อป้องกันระบบเผาผลาญชะลอตัว)\n`;
+                } else {
+                    report += `    (ปรับพลังงานติดลบอย่างปลอดภัยเฉลี่ย 15%-20% จากจุดสมดุล)\n`;
+                }
+                report += `💪 กรณีต้องการเพิ่มน้ำหนัก / สร้างกล้ามเนื้อ (Caloric Surplus):\n`;
+                report += `  * ควรรับประทานอาหารรวมให้ได้ประมาณ: ${calculatedMetrics.weightGainTarget} kcal / วัน\n`;
+                report += `    (เพิ่มพลังงานส่วนเกิน 10%-12% เพื่อสนับสนุนกระบวนการส่งสารอาหารซ่อมแซมกล้ามเนื้อแบบไม่สะสมไขมันตัวเกินกรอบ)\n`;
+            } else {
+                report += `(กรอกข้อมูลน้ำหนัก ส่วนสูง และอายุให้ครบถ้วนเพื่อคำนวณสถิติระบบเผาผลาญ)\n`;
+            }
+            
+            report += `--------------------------------------------------------------------\n`;
+            report += `[รายละเอียดคะแนนรายมิติทั้ง 12 ด้าน / 12-DIMENSIONAL SCORES]\n`;
+
+            let criticalFoci = [];
+            let totalScore = 0;
+
+            dims.forEach(d => {
+                const score = state[d.id];
+                totalScore += score;
+                const barLength = score;
+                const blockBar = '█'.repeat(barLength) + '░'.repeat(10 - barLength);
+                report += `- ${d.label.padEnd(46, ' ')}: [${blockBar}] ${score}/10\n`;
+
+                if (score <= 4) criticalFoci.push(d);
+            });
+
+            const finalAverage = (totalScore / dims.length).toFixed(2);
+            report += `\nค่าเฉลี่ยดัชนีรวม (Composite Index Average): ${finalAverage} / 10\n`;
+            report += `--------------------------------------------------------------------\n`;
+            report += `[สรุปผลประเมินรายหมวด / ZONE AVERAGES]\n`;
+
+            let zoneStatsText = {};
+            dims.forEach(d => {
+                if (!zoneStatsText[d.zone]) zoneStatsText[d.zone] = { total: 0, count: 0 };
+                zoneStatsText[d.zone].total += state[d.id];
+                zoneStatsText[d.zone].count += 1;
+            });
+
+            const zoneNames = {
+                physic: 'กายภาพ', organic: 'อวัยวะภายใน', neural: 'ระบบประสาท',
+                fat: 'การจัดการไขมัน', muscle: 'กล้ามเนื้อและความกระชับ', shape: 'สัดส่วนและระบบเผาผลาญ'
+            };
+
+            for (const [zone, data] of Object.entries(zoneStatsText)) {
+                const zoneAvg = (data.total / data.count).toFixed(2);
+                const label = zoneNames[zone] || zone;
+                report += `- หมวด${label.padEnd(25, ' ')}: ${zoneAvg} / 10\n`;
+            }
+
+            report += `--------------------------------------------------------------------\n`;
+            report += `[บทวิเคราะห์และข้อแนะนำภาพรวม / EXECUTIVE SUMMARY & COACHING]\n`;
+
+            if (activeMasterTab === 'vitality') {
+                report += `การประเมินพิจารณาจากดัชนีชีวเคมี พลังงานสำรอง การกำจัดของเสีย และความตึงตัวระบบประสาท\n\n`;
+                if (criticalFoci.length > 0) {
+                    let issueZones = [];
+                    if (criticalFoci.some(f => f.zone === 'physic')) issueZones.push('ระดับพลังงานและการพักผ่อน');
+                    if (criticalFoci.some(f => f.zone === 'organic')) issueZones.push('ระบบอวัยวะภายในและการขับถ่าย');
+                    if (criticalFoci.some(f => f.zone === 'neural')) issueZones.push('การจัดการความเครียดและระบบประสาท');
+                    
+                    report += `⚠️ ข้อควรระวังและแนวทางฟื้นฟู (Overview):\n`;
+                    report += `จากผลการประเมินพบว่าร่างกายมีจุดอ่อนที่ต้องได้รับการดูแล โดยเฉพาะในด้าน ${issueZones.join(', ')} ซึ่งอาจส่งผลกระทบต่อเนื่องถึงความสดชื่นและประสิทธิภาพการทำงานระหว่างวัน แนะนำให้ปรับสมดุลแบบองค์รวมโดยเริ่มจากการจัดระเบียบการนอนหลับให้ลึกขึ้นเพื่อซ่อมแซมเซลล์ ดื่มน้ำให้เพียงพอเพื่อกระตุ้นระบบขับถ่ายและภูมิคุ้มกัน รวมถึงการเพิ่มช่วงเวลาพักเบรกระหว่างวันหรือฝึกควบคุมลมหายใจ เพื่อลดระดับความตึงเครียดแฝงในระบบประสาทอัตโนมัติ ซึ่งจะช่วยให้พลังชีวิตโดยรวมกลับมาสมบูรณ์ขึ้น\n`;
+                } else {
+                    report += `✅ ระดับพลังชีวิตและความเสถียรของระบบประสาทอัตโนมัติ (Homeostasis) ทำงานได้สมบูรณ์แบบมาก ไม่มีข้อบ่งชี้ความเสี่ยงทางเคมีชีวภาพ\n`;
+                }
+            } else {
+                report += `การประเมินพิจารณาจากเปอร์เซ็นต์ไขมัน มวลกล้ามเนื้อ ความกระชับ สัดส่วนสรีระ และอัตราเผาผลาญ\n\n`;
+                if (criticalFoci.length > 0) {
+                    let issueZones = [];
+                    if (criticalFoci.some(f => f.zone === 'fat')) issueZones.push('ระดับไขมันสะสม');
+                    if (criticalFoci.some(f => f.zone === 'muscle')) issueZones.push('มวลกล้ามเนื้อและความกระชับ');
+                    if (criticalFoci.some(f => f.zone === 'shape')) issueZones.push('สัดส่วนสรีระและระบบเผาผลาญ');
+                    
+                    report += `⚠️ ข้อควรระวังและแนวทางการปรับปรุงรูปร่าง (Overview):\n`;
+                    report += `จากข้อมูลเชิงโครงสร้างพบว่าองค์ประกอบที่ยังเป็นอุปสรรคต่อเป้าหมายสุขภาพคือ ${issueZones.join(', ')} แนะนำให้คุมปริมาณและคุณภาพอาหารตามเป้าหมายพลังงานอย่างเคร่งครัด ลดน้ำตาลและคาร์โบไฮเดรตขัดสีเพื่อจัดการไขมันส่วนเกิน ควบคู่กับการทานโปรตีนให้ถึงเกณฑ์เพื่อป้องกันภาวะเนื้อเหลวหรือสูญเสียกล้ามเนื้อ นอกจากนี้ควรหลีกเลี่ยงอาหารโซเดียมสูงเพื่อลดอาการบวมน้ำ และเพิ่มกิจกรรมที่ต้องออกแรงต้าน (Resistance Training) ผสมกับคาร์ดิโอ ซึ่งจะช่วยรีดสัดส่วนและกระตุ้นเตาเผาพลังงานให้กลับมาทำงานอย่างมีประสิทธิภาพสูงสุด\n`;
+                } else {
+                    report += `✅ ยอดเยี่ยมมาก! องค์ประกอบร่างกาย สัดส่วน และระบบการเผาผลาญอยู่ในเกณฑ์ของคนหุ่นดี แข็งแรง และลีนกระชับอย่างสมบูรณ์\n`;
+                }
+            }
+
+            report += `\n--------------------------------------------------------------------\n`;
+            report += `ศูนย์วิเคราะห์และที่ปรึกษาการปรับรูปร่างและสุขภาพองค์รวม (Somatic Shape & Wellness Node)\n`;
+            report += `====================================================================`;
+
+            document.getElementById('master-report-textarea').value = report;
+        }
+
+        function copyMasterSomaticReport() {
+            const textarea = document.getElementById('master-report-textarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(textarea.value);
+
+            const btn = document.getElementById('copyMasterBtn');
+            btn.innerHTML = `<span class="material-icons text-sm">done</span> สำเร็จ`;
+            setTimeout(() => {
+                btn.innerHTML = `<span class="material-icons text-[14px]">content_copy</span> คัดลอก`;
+            }, 2000);
+        }
+
+        function downloadSomaticPackageReport() {
+            const name = document.getElementById('cust-name').value.trim() || 'Somatic_Patient';
+            const modeName = activeMasterTab === 'vitality' ? 'Pure_Vitality' : 'Body_Proportions';
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const fileNameBase = `${name}_${modeName}_12Axis_${dateStr}`;
+
+            const reportText = document.getElementById('master-report-textarea').value;
+            
+            const dummyCanvas = document.createElement('canvas');
+            const dummyCtx = dummyCanvas.getContext('2d');
+            dummyCtx.font = '16px monospace';
+            const maxWidth = 920; 
+            
+            const rawLines = reportText.split('\n');
+            const wrappedLines = [];
+            
+            const segmenter = window.Intl && window.Intl.Segmenter ? new Intl.Segmenter('th', { granularity: 'word' }) : null;
+
+            rawLines.forEach(line => {
+                if (!line) { wrappedLines.push(''); return; }
+                let currentLine = '';
+                
+                if (segmenter) {
+                    const segments = segmenter.segment(line);
+                    for (const segment of segments) {
+                        const word = segment.segment;
+                        const testLine = currentLine + word;
+                        if (dummyCtx.measureText(testLine).width > maxWidth && currentLine !== '') {
+                            wrappedLines.push(currentLine);
+                            currentLine = word; 
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+                    if (currentLine) wrappedLines.push(currentLine);
+                } else {
+                    let charArray = Array.from(line);
+                    for (let j = 0; j < charArray.length; j++) {
+                        let testLine = currentLine + charArray[j];
+                        if (dummyCtx.measureText(testLine).width > maxWidth && currentLine !== '') {
+                            wrappedLines.push(currentLine);
+                            currentLine = charArray[j];
+                        } else {
+                            currentLine = testLine;
+                        }
+                    }
+                    if (currentLine) wrappedLines.push(currentLine);
+                }
+            });
+
+            const lineHeight = 24;
+            const startTextY = 820;
+            const totalHeight = startTextY + (wrappedLines.length * lineHeight) + 40;
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 1000;
+            tempCanvas.height = totalHeight; 
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCtx.fillStyle = '#020617'; 
+            tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+            executeRadarDrawing(tempCtx, 1000, 800, activeMasterTab, stateVitality, stateStructure);
+
+            tempCtx.strokeStyle = '#1e293b';
+            tempCtx.lineWidth = 2;
+            tempCtx.beginPath();
+            tempCtx.moveTo(40, 790);
+            tempCtx.lineTo(960, 790);
+            tempCtx.stroke();
+
+            tempCtx.font = '16px monospace';
+            tempCtx.fillStyle = '#34d399'; 
+            tempCtx.textAlign = 'left';
+            tempCtx.textBaseline = 'top';
+
+            wrappedLines.forEach((line, index) => {
+                tempCtx.fillText(line, 40, startTextY + (index * lineHeight));
+            });
+
+            const imageURI = tempCanvas.toDataURL('image/png');
+            const imageLink = document.createElement('a');
+            imageLink.download = `${fileNameBase}_FullReport.png`;
+            imageLink.href = imageURI;
+            document.body.appendChild(imageLink);
+            imageLink.click();
+            document.body.removeChild(imageLink);
+            
+            const btn = document.getElementById('downloadPackageBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<span class="material-icons text-sm">done</span> ดาวน์โหลดสำเร็จ`;
+            setTimeout(() => { btn.innerHTML = originalHTML; }, 2500);
+        }
+
+        // ฟังก์ชันส่งอีเมลพร้อมดาวน์โหลดรายงานอัตโนมัติ และใส่ข้อความแจ้งเตือนสีแดงที่หัวและท้าย
+        function sendReportViaMailto() {
+            // 1. สั่งดาวน์โหลดรายงานฉบับสมบูรณ์ (PNG) อัตโนมัติทันที
+            downloadSomaticPackageReport();
+
+            const reportText = document.getElementById('master-report-textarea').value;
+            const targetEmail = "b.voraprach@gmail.com"; 
+            
+            const name = document.getElementById('cust-name').value.trim();
+            const subjectName = name ? ` ของ ${name}` : '';
+            const subject = encodeURIComponent(`Somatic Health Assessment Report${subjectName} - ส่งผลการวิเคราะห์`);
+            
+            // 2. จัดรูปแบบข้อความแจ้งเตือนสีแดง (ใช้สัญลักษณ์ 🔴 กำกับความชัดเจน) อยู่ทั้งหัวและท้ายเมล์
+            let bodyText = "🔴 [แจ้งเตือนสำคัญ: โปรดแนบไฟล์รายงาน PNG ที่เพิ่งดาวน์โหลดลงในเครื่องของคุณ ก่อนกดส่งอีเมลฉบับนี้ทุกครั้ง] 🔴\n\n";
+            bodyText += "--------------------------------------------------------------------\n";
+            bodyText += reportText;
+            bodyText += "\n--------------------------------------------------------------------\n";
+            bodyText += "🔴 [แจ้งเตือนสำคัญ: ตรวจสอบให้แน่ใจว่าได้แนบไฟล์รูปภาพรายงานฉบับสมบูรณ์แล้วก่อนกดส่ง] 🔴";
+            
+            const body = encodeURIComponent(bodyText);
+            
+            // 3. เปิดโปรแกรมอีเมล (รองรับทั้ง PC และ Smartphone ผ่าน mailto protocol)
+            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+        }
+
+        function loadSimulatedProfile(profileKey) {
+            const profile = simulatedProfiles[profileKey];
+            if (!profile) return;
+            vitalityDimensions.forEach(d => stateVitality[d.id] = profile.vitality[d.id]);
+            structureDimensions.forEach(d => stateStructure[d.id] = profile.structure[d.id]);
+            switchMasterTab(activeMasterTab);
+        }
+
+        function resetAllWheels() {
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-age').value = '';
+            document.getElementById('cust-weight').value = '';
+            document.getElementById('cust-height').value = '';
+            document.getElementById('cust-phone').value = '';
+            document.getElementById('cust-social').value = '';
+            document.getElementById('cust-goal').value = '';
+            calculateMetabolism();
+            loadSimulatedProfile('default');
+        }
+
+        window.addEventListener('resize', resizeMasterCanvas);
+        window.addEventListener('DOMContentLoaded', () => {
+            initMasterState();
+            switchMasterTab('vitality');
+            resizeMasterCanvas();
+        });
+    </script>
+</body>
+</html>
