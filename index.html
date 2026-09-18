@@ -868,21 +868,29 @@
                 tempCtx.fillText(line, 40, startTextY + (index * lineHeight));
             });
 
-            const imageURI = tempCanvas.toDataURL('image/png');
-            const imageLink = document.createElement('a');
-            imageLink.download = `${fileNameBase}_FullReport.png`;
-            imageLink.href = imageURI;
-            document.body.appendChild(imageLink);
-            imageLink.click();
-            document.body.removeChild(imageLink);
-            
-            const btn = document.getElementById('downloadPackageBtn');
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = `<span class="material-icons text-sm">done</span> ดาวน์โหลดสำเร็จ`;
-            setTimeout(() => { btn.innerHTML = originalHTML; }, 2500);
+            // ปรับปรุง: ใช้ toBlob แทน toDataURL เพื่อแก้ปัญหาเว็บบราวเซอร์บนมือถือแครชจากข้อความ Base64 ที่ยาวเกินไป
+            tempCanvas.toBlob(function(blob) {
+                if (!blob) return;
+                
+                const blobUrl = URL.createObjectURL(blob);
+                const imageLink = document.createElement('a');
+                imageLink.download = `${fileNameBase}_FullReport.png`;
+                imageLink.href = blobUrl;
+                document.body.appendChild(imageLink);
+                imageLink.click();
+                document.body.removeChild(imageLink);
+                
+                // คืนค่าหน่วยความจำหลังสร้างไฟล์เสร็จ
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1500);
+                
+                const btn = document.getElementById('downloadPackageBtn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<span class="material-icons text-sm">done</span> ดาวน์โหลดสำเร็จ`;
+                setTimeout(() => { btn.innerHTML = originalHTML; }, 2500);
+            }, 'image/png');
         }
 
-        // ฟังก์ชันส่งอีเมลพร้อมดาวน์โหลดรายงานอัตโนมัติ และใส่ข้อความแจ้งเตือนสีแดงที่หัวและท้าย
+        // ปรับปรุงฟังก์ชันส่งอีเมล
         function sendReportViaMailto() {
             // 1. สั่งดาวน์โหลดรายงานฉบับสมบูรณ์ (PNG) อัตโนมัติทันที
             downloadSomaticPackageReport();
@@ -894,7 +902,6 @@
             const subjectName = name ? ` ของ ${name}` : '';
             const subject = encodeURIComponent(`Somatic Health Assessment Report${subjectName} - ส่งผลการวิเคราะห์`);
             
-            // 2. จัดรูปแบบข้อความแจ้งเตือนสีแดง (ใช้สัญลักษณ์ 🔴 กำกับความชัดเจน) อยู่ทั้งหัวและท้ายเมล์
             let bodyText = "🔴 [แจ้งเตือนสำคัญ: โปรดแนบไฟล์รายงาน PNG ที่เพิ่งดาวน์โหลดลงในเครื่องของคุณ ก่อนกดส่งอีเมลฉบับนี้ทุกครั้ง] 🔴\n\n";
             bodyText += "--------------------------------------------------------------------\n";
             bodyText += reportText;
@@ -903,8 +910,10 @@
             
             const body = encodeURIComponent(bodyText);
             
-            // 3. เปิดโปรแกรมอีเมล (รองรับทั้ง PC และ Smartphone ผ่าน mailto protocol)
-            window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+            // 2. ปรับปรุง: หน่วงเวลาเปิดโปรแกรมอีเมล 1.2 วินาที เพื่อป้องกันบราวเซอร์มือถือยกเลิกการดาวน์โหลดไฟล์จากการเปลี่ยน URL ทันที
+            setTimeout(() => {
+                window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+            }, 1200);
         }
 
         function loadSimulatedProfile(profileKey) {
